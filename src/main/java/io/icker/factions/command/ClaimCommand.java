@@ -83,7 +83,7 @@ public class ClaimCommand implements Command {
             for (int y = -size + 1; y < size; y++) {
                 ChunkPos chunkPos =
                         world.getChunk(player.blockPosition().offset(x * 16, 0, y * 16)).getPos();
-                Claim existingClaim = Claim.get(chunkPos.x(), chunkPos.z(), dimension);
+                Claim existingClaim = Claim.get(chunkPos.x, chunkPos.z, dimension);
 
                 if (existingClaim != null) {
                     if (size == 1) {
@@ -113,23 +113,23 @@ public class ClaimCommand implements Command {
             }
         }
 
-        chunks.forEach(chunk -> faction.addClaim(chunk.x(), chunk.z(), dimension));
+        chunks.forEach(chunk -> faction.addClaim(chunk.x, chunk.z, dimension));
         if (size == 1) {
             new Message(
                             Component.translatable(
                                     "factions.command.claim.add.success.single",
-                                    chunks.get(0).x(),
-                                    chunks.get(0).z(),
+                                    chunks.get(0).x,
+                                    chunks.get(0).z,
                                     player.getName().getString()))
                     .send(faction);
         } else {
             new Message(
                             Component.translatable(
                                     "factions.command.claim.add.success.multiple",
-                                    chunks.get(0).x(),
-                                    chunks.get(0).z(),
-                                    chunks.get(0).x() + size - 1,
-                                    chunks.get(0).z() + size - 1,
+                                    chunks.get(0).x,
+                                    chunks.get(0).z,
+                                    chunks.get(0).x + size - 1,
+                                    chunks.get(0).z + size - 1,
                                     player.getName().getString()))
                     .send(faction);
         }
@@ -137,12 +137,13 @@ public class ClaimCommand implements Command {
         return 1;
     }
 
-    private int add(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+private int add(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
         Faction faction = Command.getUser(player).getFaction();
 
         int requiredPower =
                 (faction.getClaims().size() + 1) * FactionsMod.CONFIG.POWER.CLAIM_WEIGHT;
+        
         int maxPower =
                 faction.getUsers().size() * FactionsMod.CONFIG.POWER.MEMBER
                         + FactionsMod.CONFIG.POWER.BASE
@@ -161,10 +162,25 @@ public class ClaimCommand implements Command {
     private int addSize(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         int size = IntegerArgumentType.getInteger(context, "size");
         ServerPlayer player = context.getSource().getPlayerOrException();
+        ServerLevel world = (ServerLevel) player.level();
+        String dimension = world.dimension().identifier().toString();
         Faction faction = Command.getUser(player).getFaction();
 
+        int newChunks = 0;
+        for (int x = -size + 1; x < size; x++) {
+            for (int y = -size + 1; y < size; y++) {
+                ChunkPos chunkPos = world.getChunk(player.blockPosition().offset(x * 16, 0, y * 16)).getPos();
+                Claim existingClaim = Claim.get(chunkPos.x, chunkPos.z, dimension);
+                
+                if (existingClaim == null || !existingClaim.getFaction().equals(faction)) {
+                    newChunks++;
+                }
+            }
+        }
+
         int requiredPower =
-                (faction.getClaims().size() + 1) * FactionsMod.CONFIG.POWER.CLAIM_WEIGHT;
+                (faction.getClaims().size() + newChunks) * FactionsMod.CONFIG.POWER.CLAIM_WEIGHT;
+        
         int maxPower =
                 faction.getUsers().size() * FactionsMod.CONFIG.POWER.MEMBER
                         + FactionsMod.CONFIG.POWER.BASE
@@ -191,7 +207,7 @@ public class ClaimCommand implements Command {
         ChunkPos chunkPos = world.getChunk(player.blockPosition()).getPos();
         String dimension = world.dimension().identifier().toString();
 
-        Claim existingClaim = Claim.get(chunkPos.x(), chunkPos.z(), dimension);
+        Claim existingClaim = Claim.get(chunkPos.x, chunkPos.z, dimension);
 
         if (existingClaim == null) {
             new Message(Component.translatable("factions.command.claim.remove.fail.unclaimed"))
@@ -237,7 +253,7 @@ public class ClaimCommand implements Command {
             for (int y = -size + 1; y < size; y++) {
                 ChunkPos chunkPos =
                         world.getChunk(player.blockPosition().offset(x * 16, 0, y * 16)).getPos();
-                Claim existingClaim = Claim.get(chunkPos.x(), chunkPos.z(), dimension);
+                Claim existingClaim = Claim.get(chunkPos.x, chunkPos.z, dimension);
 
                 if (existingClaim != null
                         && (user.bypass || existingClaim.getFaction().equals(faction)))
@@ -251,10 +267,10 @@ public class ClaimCommand implements Command {
         new Message(
                         Component.translatable(
                                 "factions.command.claim.remove.success.multiple",
-                                chunkPos.x(),
-                                chunkPos.z(),
-                                chunkPos.x() + size - 1,
-                                chunkPos.z() + size - 1,
+                                chunkPos.x,
+                                chunkPos.z,
+                                chunkPos.x + size - 1,
+                                chunkPos.z + size - 1,
                                 player.getName().getString()))
                 .send(faction);
 
@@ -307,7 +323,7 @@ public class ClaimCommand implements Command {
         ChunkPos chunkPos = world.getChunk(player.blockPosition()).getPos();
         String dimension = world.dimension().identifier().toString();
 
-        Claim claim = Claim.get(chunkPos.x(), chunkPos.z(), dimension);
+        Claim claim = Claim.get(chunkPos.x, chunkPos.z, dimension);
 
         if (claim == null) {
             new Message(

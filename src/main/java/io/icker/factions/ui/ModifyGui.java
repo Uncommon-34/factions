@@ -42,7 +42,7 @@ public class ModifyGui extends SimpleGui {
                         .setProfileSkinTexture(Icons.GUI_TV_TEXT)
                         .setName(Component.translatable("factions.gui.modify.change_name"))
                         .setCallback(
-                                (index, clickType, actionType, _) -> {
+                                (index, clickType, actionType) -> {
                                     this.execName(faction);
                                 }));
         this.setSlot(
@@ -51,7 +51,7 @@ public class ModifyGui extends SimpleGui {
                         .setProfileSkinTexture(Icons.GUI_BOOK)
                         .setName(Component.translatable("factions.gui.modify.change_description"))
                         .setCallback(
-                                (index, clickType, actionType, _) -> {
+                                (index, clickType, actionType) -> {
                                     this.execDesc(faction);
                                 }));
         this.setSlot(
@@ -60,7 +60,7 @@ public class ModifyGui extends SimpleGui {
                         .setProfileSkinTexture(Icons.GUI_RADIO)
                         .setName(Component.translatable("factions.gui.modify.change_motd"))
                         .setCallback(
-                                (index, clickType, actionType, _) -> {
+                                (index, clickType, actionType) -> {
                                     this.execMOTD(faction);
                                 }));
         this.setSlot(
@@ -69,7 +69,7 @@ public class ModifyGui extends SimpleGui {
                         .setProfileSkinTexture(Icons.GUI_PAINT_BUCKET)
                         .setName(Component.translatable("factions.gui.modify.change_color"))
                         .setCallback(
-                                (index, clickType, actionType, _) -> {
+                                (index, clickType, actionType) -> {
                                     new ColorGui(player, faction, this::open);
                                 }));
         this.setSlot(5, buildOpenFactionButton(faction));
@@ -106,7 +106,7 @@ public class ModifyGui extends SimpleGui {
                                                         "factions.gui.modify.faction_type.invite")
                                                 .withStyle(ChatFormatting.RED)))
                 .setCallback(
-                        (index, clickType, actionType, _) -> {
+                        (index, clickType, actionType) -> {
                             faction.setOpen(!faction.isOpen());
                             this.setSlot(index, buildOpenFactionButton(faction));
                         });
@@ -121,7 +121,7 @@ public class ModifyGui extends SimpleGui {
 
         inputGui.returnBtn.setCallback(defaultReturn);
         inputGui.confirmBtn.setCallback(
-                (index, clickType, actionType, _) -> {
+                (index, clickType, actionType) -> {
                     String name = inputGui.getInput();
 
                     try {
@@ -152,7 +152,7 @@ public class ModifyGui extends SimpleGui {
 
         inputGui.returnBtn.setCallback(defaultReturn);
         inputGui.confirmBtn.setCallback(
-                (index, clickType, actionType, _) -> {
+                (index, clickType, actionType) -> {
                     String desc = inputGui.getInput();
                     faction.setDescription(desc);
                     new Message(
@@ -175,7 +175,7 @@ public class ModifyGui extends SimpleGui {
 
         inputGui.returnBtn.setCallback(defaultReturn);
         inputGui.confirmBtn.setCallback(
-                (index, clickType, actionType, _) -> {
+                (index, clickType, actionType) -> {
                     String motd = inputGui.getInput();
                     faction.setMOTD(motd);
                     new Message(

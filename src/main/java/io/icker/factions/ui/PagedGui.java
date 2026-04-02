@@ -2,6 +2,8 @@ package io.icker.factions.ui;
 
 import eu.pb4.sgui.api.elements.GuiElement;
 import eu.pb4.sgui.api.elements.GuiElementBuilder;
+import eu.pb4.sgui.api.elements.GuiElementBuilderInterface;
+import eu.pb4.sgui.api.elements.GuiElementInterface;
 import eu.pb4.sgui.api.gui.SimpleGui;
 
 import io.icker.factions.util.GuiInteract;
@@ -38,7 +40,7 @@ public abstract class PagedGui extends SimpleGui {
     }
 
     @Override
-    public void onManualClose() {
+    public void onClose() {
         if (this.closeCallback != null && !ignoreCloseCallback) {
             this.closeCallback.run();
         }
@@ -75,7 +77,7 @@ public abstract class PagedGui extends SimpleGui {
             if (element.element() != null) {
                 this.setSlot(i, element.element());
             } else if (element.slot() != null) {
-                this.setSlot(i, element.slot());
+                this.setSlotRedirect(i, element.slot());
             }
         }
 
@@ -89,7 +91,7 @@ public abstract class PagedGui extends SimpleGui {
             if (navElement.element != null) {
                 this.setSlot(i + PAGE_SIZE, navElement.element);
             } else if (navElement.slot != null) {
-                this.setSlot(i + PAGE_SIZE, navElement.slot);
+                this.setSlotRedirect(i + PAGE_SIZE, navElement.slot);
             }
         }
     }
@@ -117,7 +119,7 @@ public abstract class PagedGui extends SimpleGui {
                                                     .withStyle(ChatFormatting.RED))
                                     .hideDefaultTooltip()
                                     .setCallback(
-                                            (x, y, z, _) -> {
+                                            (x, y, z) -> {
                                                 playClickSound(this.player);
                                                 this.close(this.closeCallback != null);
                                             }));
@@ -125,20 +127,21 @@ public abstract class PagedGui extends SimpleGui {
         };
     }
 
-    public record DisplayElement(@Nullable GuiElement element, @Nullable Slot slot) {
+    public record DisplayElement(@Nullable GuiElementInterface element, @Nullable Slot slot) {
         private static final DisplayElement EMPTY =
-                DisplayElement.of(GuiElementBuilder.from(ItemStack.EMPTY).build());
+                DisplayElement.of(
+                        new GuiElement(ItemStack.EMPTY, GuiElementInterface.EMPTY_CALLBACK));
         private static final DisplayElement FILLER =
                 DisplayElement.of(
                         new GuiElementBuilder(Items.WHITE_STAINED_GLASS_PANE)
                                 .setName(Component.empty())
                                 .hideTooltip());
 
-        public static DisplayElement of(GuiElement element) {
+        public static DisplayElement of(GuiElementInterface element) {
             return new DisplayElement(element, null);
         }
 
-        public static DisplayElement of(GuiElementBuilder element) {
+        public static DisplayElement of(GuiElementBuilderInterface<?> element) {
             return new DisplayElement(element.build(), null);
         }
 
@@ -156,7 +159,7 @@ public abstract class PagedGui extends SimpleGui {
                                 .hideDefaultTooltip()
                                 .setProfileSkinTexture(Icons.GUI_NEXT_PAGE)
                                 .setCallback(
-                                        (x, y, z, _) -> {
+                                        (x, y, z) -> {
                                             playClickSound(gui.player);
                                             gui.nextPage();
                                         }));
@@ -181,7 +184,7 @@ public abstract class PagedGui extends SimpleGui {
                                 .hideDefaultTooltip()
                                 .setProfileSkinTexture(Icons.GUI_PREVIOUS_PAGE)
                                 .setCallback(
-                                        (x, y, z, _) -> {
+                                        (x, y, z) -> {
                                             playClickSound(gui.player);
                                             gui.previousPage();
                                         }));

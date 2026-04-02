@@ -72,11 +72,7 @@ public class Message {
     }
 
     public Message send(Player player, boolean actionBar) {
-        if (actionBar) {
-            player.sendOverlayMessage(this.text);
-        } else {
-            player.sendSystemMessage(this.text);
-        }
+        player.displayClientMessage(text, actionBar);
         return this;
     }
 
@@ -92,14 +88,14 @@ public class Message {
     public void sendToGlobalChat() {
         for (ServerPlayer player : manager.getPlayers()) {
             User.ChatMode option = User.get(player.getUUID()).chat;
-            if (option != User.ChatMode.FOCUS) player.sendSystemMessage(text);
+            if (option != User.ChatMode.FOCUS) player.displayClientMessage(text, false);
         }
     }
 
     public void sendToFactionChat(Faction faction) {
         for (User member : faction.getUsers()) {
             ServerPlayer player = manager.getPlayer(member.getID());
-            player.sendSystemMessage(text);
+            player.displayClientMessage(text, false);
         }
     }
 

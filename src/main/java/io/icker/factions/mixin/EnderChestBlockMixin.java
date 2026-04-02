@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(EnderChestBlock.class)
 public class EnderChestBlockMixin {
     @Inject(method = "useWithoutItem", at = @At("HEAD"), cancellable = true)
-    public void useWithoutItem(
+    public void onUse(
             BlockState state,
             Level world,
             BlockPos pos,

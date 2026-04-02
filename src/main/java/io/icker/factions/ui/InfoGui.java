@@ -286,9 +286,9 @@ public class InfoGui extends SimpleGui {
     }
 
     @Override
-    public void onManualClose() {
+    public void onClose() {
         if (closeCallback == null) {
-            super.onManualClose();
+            super.onClose();
             return;
         }
         closeCallback.run();
