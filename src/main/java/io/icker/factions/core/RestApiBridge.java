@@ -43,125 +43,168 @@ public class RestApiBridge {
 
     public static void register() {
         FactionEvents.CREATE.register((faction, owner) -> {
-            JsonObject data = new JsonObject();
-            data.addProperty("factionId", faction.getID().toString());
-            data.addProperty("factionName", faction.getName());
-            data.addProperty("color", faction.getColor().getName());
-            data.addProperty("open", faction.isOpen());
-            data.addProperty("ownerUuid", owner.getID().toString());
-            push("faction.created", owner.getID().toString(), data);
+            try {
+                if (faction == null || owner == null) return;
+                JsonObject data = new JsonObject();
+                data.addProperty("factionId", faction.getID().toString());
+                data.addProperty("factionName", faction.getName());
+                data.addProperty("color", faction.getColor().getName());
+                data.addProperty("open", faction.isOpen());
+                data.addProperty("ownerUuid", owner.getID().toString());
+                push("faction.created", owner.getID().toString(), data);
+            } catch (Exception e) {
+                FactionsMod.LOGGER.error("[Factions] RestApiBridge error in CREATE handler", e);
+            }
         });
 
         FactionEvents.DISBAND.register((faction) -> {
-            JsonObject data = new JsonObject();
-            data.addProperty("factionId", faction.getID().toString());
-            data.addProperty("factionName", faction.getName());
-            data.addProperty("memberCount", faction.getUsers().size());
-            data.addProperty("claimCount", faction.getClaims().size());
-            push("faction.disbanded", null, data);
+            try {
+                if (faction == null) return;
+                JsonObject data = new JsonObject();
+                data.addProperty("factionId", faction.getID().toString());
+                data.addProperty("factionName", faction.getName());
+                data.addProperty("memberCount", faction.getUsers().size());
+                data.addProperty("claimCount", faction.getClaims().size());
+                push("faction.disbanded", null, data);
+            } catch (Exception e) {
+                FactionsMod.LOGGER.error("[Factions] RestApiBridge error in DISBAND handler", e);
+            }
         });
 
         FactionEvents.MEMBER_JOIN.register((faction, user) -> {
-            if (faction == null || user == null) return;
-            JsonObject data = new JsonObject();
-            data.addProperty("factionId", faction.getID().toString());
-            data.addProperty("factionName", faction.getName());
-            data.addProperty("playerUuid", user.getID().toString());
-            data.addProperty("rank", user.getRankName());
-            push("faction.member_join", user.getID().toString(), data);
+            try {
+                if (faction == null || user == null) return;
+                JsonObject data = new JsonObject();
+                data.addProperty("factionId", faction.getID().toString());
+                data.addProperty("factionName", faction.getName());
+                data.addProperty("playerUuid", user.getID().toString());
+                data.addProperty("rank", user.getRankName());
+                push("faction.member_join", user.getID().toString(), data);
+            } catch (Exception e) {
+                FactionsMod.LOGGER.error("[Factions] RestApiBridge error in MEMBER_JOIN handler", e);
+            }
         });
 
         FactionEvents.MEMBER_LEAVE.register((faction, user) -> {
-            if (faction == null || user == null) return;
-            JsonObject data = new JsonObject();
-            data.addProperty("factionId", faction.getID().toString());
-            data.addProperty("factionName", faction.getName());
-            data.addProperty("playerUuid", user.getID().toString());
-            push("faction.member_leave", user.getID().toString(), data);
+            try {
+                if (faction == null || user == null) return;
+                JsonObject data = new JsonObject();
+                data.addProperty("factionId", faction.getID().toString());
+                data.addProperty("factionName", faction.getName());
+                data.addProperty("playerUuid", user.getID().toString());
+                push("faction.member_leave", user.getID().toString(), data);
+            } catch (Exception e) {
+                FactionsMod.LOGGER.error("[Factions] RestApiBridge error in MEMBER_LEAVE handler", e);
+            }
         });
 
         FactionEvents.MODIFY.register((faction) -> {
-            JsonObject data = new JsonObject();
-            data.addProperty("factionId", faction.getID().toString());
-            data.addProperty("factionName", faction.getName());
-            data.addProperty("description", faction.getDescription());
-            data.addProperty("motd", faction.getMOTD());
-            data.addProperty("color", faction.getColor().getName());
-            data.addProperty("open", faction.isOpen());
-            push("faction.modified", null, data);
+            try {
+                if (faction == null) return;
+                JsonObject data = new JsonObject();
+                data.addProperty("factionId", faction.getID().toString());
+                data.addProperty("factionName", faction.getName());
+                data.addProperty("description", faction.getDescription());
+                data.addProperty("motd", faction.getMOTD());
+                data.addProperty("color", faction.getColor().getName());
+                data.addProperty("open", faction.isOpen());
+                push("faction.modified", null, data);
+            } catch (Exception e) {
+                FactionsMod.LOGGER.error("[Factions] RestApiBridge error in MODIFY handler", e);
+            }
         });
 
         FactionEvents.SET_HOME.register((faction, home) -> {
-            JsonObject data = new JsonObject();
-            data.addProperty("factionId", faction.getID().toString());
-            data.addProperty("factionName", faction.getName());
-            if (home != null) {
-                data.addProperty("x", home.x);
-                data.addProperty("y", home.y);
-                data.addProperty("z", home.z);
-                data.addProperty("dimension", home.level);
-            } else {
-                data.addProperty("cleared", true);
+            try {
+                if (faction == null) return;
+                JsonObject data = new JsonObject();
+                data.addProperty("factionId", faction.getID().toString());
+                data.addProperty("factionName", faction.getName());
+                if (home != null) {
+                    data.addProperty("x", home.x);
+                    data.addProperty("y", home.y);
+                    data.addProperty("z", home.z);
+                    data.addProperty("dimension", home.level);
+                } else {
+                    data.addProperty("cleared", true);
+                }
+                push("faction.home_set", null, data);
+            } catch (Exception e) {
+                FactionsMod.LOGGER.error("[Factions] RestApiBridge error in SET_HOME handler", e);
             }
-            push("faction.home_set", null, data);
         });
 
         ClaimEvents.ADD.register((claim) -> {
-            Faction faction = Faction.get(claim.factionID);
-            if (faction == null) return;
-            JsonObject data = new JsonObject();
-            data.addProperty("factionId", faction.getID().toString());
-            data.addProperty("factionName", faction.getName());
-            data.addProperty("x", claim.x);
-            data.addProperty("z", claim.z);
-            data.addProperty("dimension", claim.level);
-            push("claim.added", null, data);
+            try {
+                Faction faction = Faction.get(claim.factionID);
+                if (faction == null) return;
+                JsonObject data = new JsonObject();
+                data.addProperty("factionId", faction.getID().toString());
+                data.addProperty("factionName", faction.getName());
+                data.addProperty("x", claim.x);
+                data.addProperty("z", claim.z);
+                data.addProperty("dimension", claim.level);
+                push("claim.added", null, data);
+            } catch (Exception e) {
+                FactionsMod.LOGGER.error("[Factions] RestApiBridge error in CLAIM_ADD handler", e);
+            }
         });
 
         ClaimEvents.REMOVE.register((x, z, level, faction) -> {
-            if (faction == null) return;
-            JsonObject data = new JsonObject();
-            data.addProperty("factionId", faction.getID().toString());
-            data.addProperty("factionName", faction.getName());
-            data.addProperty("x", x);
-            data.addProperty("z", z);
-            data.addProperty("dimension", level);
-            push("claim.removed", null, data);
+            try {
+                if (faction == null) return;
+                JsonObject data = new JsonObject();
+                data.addProperty("factionId", faction.getID().toString());
+                data.addProperty("factionName", faction.getName());
+                data.addProperty("x", x);
+                data.addProperty("z", z);
+                data.addProperty("dimension", level);
+                push("claim.removed", null, data);
+            } catch (Exception e) {
+                FactionsMod.LOGGER.error("[Factions] RestApiBridge error in CLAIM_REMOVE handler", e);
+            }
         });
 
         // Chat events — subscribe to global.chat and faction.chat in your bot,
         // not the generic MCRestAPI "chat" event, to avoid double-posting.
         ServerMessageEvents.CHAT_MESSAGE.register((message, sender, params) -> {
-            User user = User.get(sender.getUUID());
-            if (user == null) return;
-            String rawMessage = message.signedContent();
-            String playerName = sender.getGameProfile().name();
-            String playerUuid = sender.getUUID().toString();
+            try {
+                User user = User.get(sender.getUUID());
+                if (user == null) return;
+                String rawMessage = message.signedContent();
+                String playerName = sender.getGameProfile().name();
+                String playerUuid = sender.getUUID().toString();
 
-            if (user.chat == User.ChatMode.GLOBAL) {
-                JsonObject data = new JsonObject();
-                data.addProperty("playerName", playerName);
-                data.addProperty("playerUuid", playerUuid);
-                data.addProperty("message", rawMessage);
-                // Include faction tag if the player is in one (shown in global chat)
-                if (user.isInFaction()) {
+                if (user.chat == User.ChatMode.GLOBAL) {
+                    JsonObject data = new JsonObject();
+                    data.addProperty("playerName", playerName);
+                    data.addProperty("playerUuid", playerUuid);
+                    data.addProperty("message", rawMessage);
+                    // Include faction tag if the player is in one (shown in global chat)
+                    if (user.isInFaction()) {
+                        Faction faction = user.getFaction();
+                        if (faction != null) {
+                            data.addProperty("factionId", faction.getID().toString());
+                            data.addProperty("factionName", faction.getName());
+                            data.addProperty("factionColor", faction.getColor().getName());
+                        }
+                    }
+                    push("global.chat", playerName, data);
+                } else if (user.chat == User.ChatMode.FACTION || user.chat == User.ChatMode.FOCUS) {
+                    if (!user.isInFaction()) return;
                     Faction faction = user.getFaction();
+                    if (faction == null) return;
+                    JsonObject data = new JsonObject();
                     data.addProperty("factionId", faction.getID().toString());
                     data.addProperty("factionName", faction.getName());
                     data.addProperty("factionColor", faction.getColor().getName());
+                    data.addProperty("playerName", playerName);
+                    data.addProperty("playerUuid", playerUuid);
+                    data.addProperty("message", rawMessage);
+                    push("faction.chat", playerName, data);
                 }
-                push("global.chat", playerName, data);
-            } else if (user.chat == User.ChatMode.FACTION || user.chat == User.ChatMode.FOCUS) {
-                if (!user.isInFaction()) return;
-                Faction faction = user.getFaction();
-                JsonObject data = new JsonObject();
-                data.addProperty("factionId", faction.getID().toString());
-                data.addProperty("factionName", faction.getName());
-                data.addProperty("factionColor", faction.getColor().getName());
-                data.addProperty("playerName", playerName);
-                data.addProperty("playerUuid", playerUuid);
-                data.addProperty("message", rawMessage);
-                push("faction.chat", playerName, data);
+            } catch (Exception e) {
+                FactionsMod.LOGGER.error("[Factions] RestApiBridge error in CHAT_MESSAGE handler", e);
             }
         });
 
