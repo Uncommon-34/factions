@@ -104,6 +104,8 @@ public class InteractionManager {
     }
 
     private static InteractionResult onExplodeDamage(Explosion explosion, Entity entity) {
+        Permissions perm = entity instanceof Player ? Permissions.ATTACK_PLAYERS : Permissions.ATTACK_ENTITIES;
+
         if (explosion.getIndirectSourceEntity() != null
                 && explosion.getIndirectSourceEntity() instanceof Player) {
             InteractionResult result =
@@ -111,7 +113,7 @@ public class InteractionManager {
                             (Player) explosion.getIndirectSourceEntity(),
                             entity.blockPosition(),
                             explosion.level(),
-                            Permissions.ATTACK_ENTITIES);
+                            perm);
             if (result == InteractionResult.FAIL) {
                 InteractionsUtil.warn(
                         (ServerPlayer) explosion.getIndirectSourceEntity(),
@@ -134,7 +136,7 @@ public class InteractionManager {
                 return InteractionResult.PASS;
             }
 
-            if (claimFaction.guest_permissions.contains(Permissions.ATTACK_ENTITIES)) {
+            if (claimFaction.guest_permissions.contains(perm)) { 
                 return InteractionResult.PASS;
             }
 
@@ -232,12 +234,14 @@ public class InteractionManager {
             InteractionHand hand,
             Entity entity,
             EntityHitResult hitResult) {
-        if (entity != null
-                && checkPermissions(
-                                player, entity.blockPosition(), world, Permissions.ATTACK_ENTITIES)
-                        == InteractionResult.FAIL) {
-            InteractionsUtil.warn((ServerPlayer) player, InteractionsUtilActions.ATTACK_ENTITIES);
-            return InteractionResult.FAIL;
+        if (entity != null) {
+            Permissions perm = entity instanceof Player ? Permissions.ATTACK_PLAYERS : Permissions.ATTACK_ENTITIES;
+            
+            if (checkPermissions(player, entity.blockPosition(), world, perm)
+                    == InteractionResult.FAIL) {
+                InteractionsUtil.warn((ServerPlayer) player, InteractionsUtilActions.ATTACK_ENTITIES);
+                return InteractionResult.FAIL;
+            }
         }
 
         return InteractionResult.PASS;
@@ -330,6 +334,8 @@ public class InteractionManager {
                 allowed = spawnPerms.INTERACT_ENTITIES;
             } else if (permission == Permissions.ATTACK_ENTITIES) {
                 allowed = spawnPerms.DAMAGE_ENTITIES;
+            } else if (permission == Permissions.ATTACK_PLAYERS) {
+                allowed = spawnPerms.DAMAGE_PLAYERS;
             } else {
                 allowed = spawnPerms.USE_ITEMS; 
             }

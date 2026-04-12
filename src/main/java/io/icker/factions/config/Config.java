@@ -152,7 +152,10 @@ public class Config {
         public boolean USE_ITEMS = true;
         
         @SerializedName("damageEntities")
-        public boolean DAMAGE_ENTITIES = false;
+        public boolean DAMAGE_ENTITIES = true;
+
+        @SerializedName("damagePlayers")
+        public boolean DAMAGE_PLAYERS = false;
     }
 
     public static class DisplayConfig {
