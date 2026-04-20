@@ -18,6 +18,7 @@ public class Relationship {
         BREAK_BLOCKS,
         USE_ENTITIES,
         ATTACK_ENTITIES,
+        ATTACK_PLAYERS,
         USE_INVENTORIES
     }
 
